@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Futuristický Cestovatelský Kvíz: Hlavní Města a Zajímavosti</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #e74c3c;
+            --bg-color: #f0f3f5;
+            --text-color: #2c3e50;
+            --correct-color: #2ecc71;
+            --incorrect-color: #e74c3c;
+            --value-color: chocolate;
+        }
+
+        body {
+            font-family: Consolas, monaco, monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            background-color: rgba(10, 10, 42, 0.9);
+            box-shadow: 0 0 30px var(--primary-color);
+            overflow-y: auto; /* Add vertical scrolling */
+        }
+        html, body {
+            touch-action: manipulation;
+        }
+        #quiz-container {
+            padding: 15px;
+            border-radius: 09px;
+            text-align: center;
+            max-width: 1980px;
+            width: 1980px;
+            margin: auto;
+            /* Na začátku skryjeme kvíz, dokud se nespustí ze startovací obrazovky */
+            display: none;
+        }
+
+        h1 {
+            color: #00ffea; /* Neonová barva, která odpovídá tématu */
+            font-weight: bold; /* Tučný text */
+            text-decoration: underline; /* Podtržení */
+            font-size: 2.1em; /* Velikost písma */
+            margin-bottom: 20px; /* Mezera pod nadpisem */
+            font-family: 'Orbitron', sans-serif; /* Futuristický font */
+            text-shadow: 0 0 10px rgba(0, 255, 234, 0.8), /* Neonový efekt stínu */
+                                 0 0 20px rgba(255, 0, 0, 0.5); /* Červený stín pro zvýraznění */
+            transition: color 0.3s ease; /* Plynulý přechod barvy */
+        }
+
+        h1:hover {
+            color: #DA0000; /* Změna barvy při najetí myší */
+            text-shadow: 0 0 15px rgba(0, 0, 0, 0.5), /* Tmavší stín při najetí */
+                                 0 0 30px rgba(0, 255, 234, 1); /* Zesílený neonový efekt */
+        }
+
+        .question-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            opacity: 1;
+            transition: opacity 0.5s ease; /* Pomalejší změna průhlednosti */
+        }
+
+        .question-text {
+            font-size: 1.2em; /* Velikost písma */
+            margin-bottom: 15px; /* Mezera pod textem */
+            color: #00ffea; /* Neonová barva, která ladí s tématem */
+            text-shadow: 0 0 5px rgba(255, 0, 0, 0.8), /* Červený stín pro zvýraznění */
+                                 0 0 10px rgba(0, 255, 234, 0.6); /* Neonový efekt stínu */
+            font-family: Consolas, monaco, monospace;
+            transition: color 0.3s ease; /* Plynulý přechod barvy */
+            font-weight: bold; /* Tučný text */
+        }
+
+        .question-text:hover {
+            color: tomato; /* Změna barvy při najetí myší */
+            text-shadow: 0 0 15px rgba(255, 0, 0, 1), /* Zvýrazněný stín při najetí */
+                                 0 0 20px rgba(0, 255, 234, 0.8);
+            font-weight: bold; /* Tučný text */
+        }
+
+        .question-image {
+            max-width: 100%; /* Maximální šířka obrázku */
+            max-height: 40vh; /* Maximální výška obrázku */
+            object-fit: contain; /* Zachování poměru stran */
+            border-radius: 12px; /* Zakulacené rohy pro futuristický vzhled */
+            margin-bottom: 15px; /* Mezera pod obrázkem */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Zvýšený stín pro hloubku */
+            border: 4px solid #00ffea; /* Neonový rámeček */
+            transition: transform 0.3s ease; /* Plynulý efekt při najetí myší */
+        }
+
+        .question-image:hover {
+            box-shadow: 0 8px 16px rgba(0, 255, 234, 0.4); /* Zvýrazněný stín při najetí */
+        }
+
+        .answers-container {
+            display: grid;
+            justify-content: center;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, auto);
+            grid-gap: 5px;
+            margin-bottom: 5px;
+        }
+
+        .answer-button {
+            width: 100%;
+            padding: 12px 0;
+            font-size: 1em;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background-color: #00FF00;
+            color: black;
+            font-weight: bold;
+            font-family: Consolas, monaco, monospace;
+        }
+
+        .answer-button:hover {
+            background-color: olive;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            color: black;
+            font-weight: bold;
+        }
+
+        .answer-button.correct {
+            background-color: green;
+            color: black;
+            font-weight: bold;
+        }
+
+        .answer-button.incorrect {
+            background-color: red;
+            color: black;
+            font-weight: bold;
+        }
+
+        .answer-button.show-correct {
+            background-color: green;
+            color: black;
+            font-weight: bold;
+        }
+
+        /* New styles for answer button feedback */
+        .answer-button.correct-feedback {
+            animation: correctGlow 0.5s ease-in-out forwards;
+        }
+
+        .answer-button.incorrect-feedback {
+            animation: incorrectGlow 0.5s ease-in-out forwards;
+        }
+
+        @keyframes correctGlow {
+            0% { box-shadow: 0 0 0px green; }
+            50% { box-shadow: 0 0 15px green, 0 0 25px green; }
+            100% { box-shadow: 0 0 0px green; }
+        }
+
+        @keyframes incorrectGlow {
+            0% { box-shadow: 0 0 0px red; }
+            50% { box-shadow: 0 0 15px red, 0 0 25px red; }
+            100% { box-shadow: 0 0 0px red; }
+        }
+
+
+        #navigation {
+            margin-top: 20px;
+        }
+
+        #prev-button, #next-button {
+            background: linear-gradient(145deg, #111111, #1a1a1a); /* Jemný tmavý přechod */
+            color: green;
+            border: 2px solid #f1c40f;
+            padding: 12px 25px;
+            font-size: 13px;
+            font-family: 'Orbitron', sans-serif;
+            border-radius: 20px; /* Zakulacený futuristický tvar */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: ;
+            letter-spacing: 2px; /* Rozšíření písmen pro futuristický vzhled */
+            position: relative;
+            overflow: hidden;
+            font-weight: bold; /* Tučný text */
+        }
+
+        /* Zvýraznění při najetí myši */
+        #prev-button:hover, #next-button:hover {
+            background: linear-gradient(145deg, #333333, #1a1a1a); /* Reverzní přechod při najetí */
+            box-shadow: 0 5px 20px rgba(0, 255, 234, 0.7), 0 0 15px rgba(0, 255, 234, 0.4) inset; /* Zesílení stínu při najetí */
+            color: green; /* Bílý text při najetí */
+            border-color: green; /* Bílý okraj při najetí */
+            font-weight: bold; /* Tučný text */
+        }
+
+        /* Upravený kontejner pro statistiky */
+        #stats-display-container {
+            display: flex;
+            justify-content: center; /* Vycentruje prvky vodorovně */
+            align-items: center; /* Zarovná prvky svisle na střed */
+            gap: 15px; /* Větší mezera mezi prvky pro lepší přehlednost */
+            margin: 10px auto; /* Menší svislá mezera a vycentrování */
+            flex-wrap: wrap; /* Umožní zalomení na více řádků na malých obrazovkách */
+            font-size: 1em; /* Základní velikost písma pro všechny statistiky */
+            color: #00ffea; /* Jednotná barva pro všechny statistiky */
+            font-weight: bold; /* Tučný text */
+        }
+
+        #question-counter-display,
+        #correct-answers-display,
+        #incorrect-answers-display,
+        #score-percentage-display,
+        #timer-display {
+            padding: 5px 10px;
+            border-radius: 5px;
+            background-color: rgba(0, 0, 0, 0.3); /* Lehké průhledné pozadí */
+            box-shadow: 0 0 5px rgba(0, 255, 234, 0.4); /* Jemný neonový stín */
+            display: flex; /* Použijeme Flexbox pro zarovnání uvnitř každého divu */
+            align-items: center;
+            white-space: nowrap; /* Zabrání zalomení textu */
+        }
+
+        /* Specifické barvy pro čitelnost */
+        #correct-answers-display { color: darkseagreen; }
+        #incorrect-answers-display { color: red; }
+        #score-percentage-display { color: #f0e68c; }
+        #timer-display { color: red; } /* Časovač stále červený */
+        #question-counter-display { color: #61dafb; }
+
+
+        /* Původní styly, které možná překrývají nové, je třeba je zkontrolovat a upravit/odebrat */
+        #question-counter { /* Tuto původní deklaraci nyní nepoužíváme pro display statistik */
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #00ffea;
+            text-shadow: 0 0 5px rgba(0, 255, 234, 0.7);
+        }
+
+        #current-question {
+            font-weight: bold;
+        }
+
+        /* Vylepšené styly pro tabulku výsledků */
+        #results-table {
+            width: 90%; /* Zmenšeno pro lepší vzhled */
+            border-collapse: separate; /* Umožní border-radius na buňkách */
+            border-spacing: 0; /* Odstraní mezery mezi buňkami */
+            margin: 20px auto; /* Vycentrování tabulky */
+            max-height: 350px;
+            overflow-y: auto;
+            background-color: rgba(255, 255, 255, 0.05); /* Lehce průhledné pozadí */
+            border: 1px solid #00ffea; /* Neonový rámeček */
+            border-radius: 12px; /* Zaoblené rohy tabulky */
+            box-shadow: 0 0 20px rgba(0, 255, 234, 0.5); /* Výraznější neonový stín */
+        }
+
+        #results-table th, #results-table td {
+            padding: 15px; /* Větší odsazení pro lepší čitelnost */
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 255, 234, 0.2); /* Jemná dělící čára */
+            color: #e0e0e0; /* Světlejší text */
+        }
+
+        #results-table th {
+            background: linear-gradient(180deg, #00ffea, #00b3a3); /* Futuristiký gradient pro hlavičku */
+            color: #1a1a1a; /* Tmavý text na světlém pozadí */
+            font-weight: bold;
+            text-transform: uppercase; /* Všechna písmena velká */
+            font-family: 'Orbitron', sans-serif;
+            position: sticky; /* Sticky hlavička při scrollování */
+            top: 0;
+            z-index: 1;
+        }
+
+        #results-table tbody tr:last-child td {
+            border-bottom: none; /* Poslední řádek bez spodní čáry */
+        }
+
+        #results-table tbody tr:hover {
+            background-color: rgba(0, 255, 234, 0.1); /* Jemné zvýraznění při najetí myší */
+        }
+
+        #results-table td.correct-answer {
+            background-color: rgba(0, 255, 0, 0.2); /* Průhlednější zelená */
+            color: #00ff00; /* Jasnější zelený text */
+            font-weight: bold;
+        }
+
+        #results-table td.incorrect-answer {
+            background-color: rgba(255, 0, 0, 0.2); /* Průhlednější červená */
+            color: #ff0000; /* Jasnější červený text */
+            font-weight: bold;
+        }
+
+        /* Zaoblení rohů pro první a poslední buňky hlavičky */
+        #results-table th:first-child {
+            border-top-left-radius: 10px;
+        }
+        #results-table th:last-child {
+            border-top-right-radius: 10px;
+        }
+        #results-table tr:last-child td:first-child {
+            border-bottom-left-radius: 10px;
+        }
+        #results-table tr:last-child td:last-child {
+            border-bottom-right-radius: 10px;
+        }
+
+
+        /* Nový styl pro nadpis výsledků kvízu */
+        #results-container h2 {
+            color: #007bff; /* Modrá barva, můžete změnit podle vašich preferencí */
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        #final-score {
+            font-size: 1.8em;
+            margin-top: 20px;
+            color: goldenrod;
+            font-weight: bold; /* Tučný text */
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Nový flexbox kontejner pro audio a ovládací prvky */
+        #controls-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px; /* Mezera mezi prvky */
+            margin-top: 10px; /* Upravíme mezery nahoře */
+            flex-wrap: wrap; /* Zalamování na malé obrazovky */
+        }
+
+        #play-button, #stop-button, #pause-button, #start-button {
+            background: linear-gradient(145deg, #1a1a1a, #111111); /* Jemný tmavý přechod */
+            color: green;
+            border: 2px solid #f1c40f;
+            padding: 12px 25px;
+            font-size: 1em; /* Jednotná velikost písma */
+            font-family: 'Orbitron', sans-serif;
+            border-radius: 20px; /* Zakulacený futuristický tvar */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1px; /* Mírně zmenšíme pro lepší čitelnost na tlačítkách */
+            font-weight: bold; /* Tučný text */
+            flex-shrink: 0; /* Zabrání zmenšování tlačítek */
+        }
+
+        /* Zvýraznění při kliknutí na tlačítko (aktivní stav) */
+        #play-button.active {
+            background: #00ffea; /* Aktivní tlačítko bude zářit modře */
+            color: #111111;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 15px #00ffea, 0 0 25px #00ffea, 0 0 35px #00ffea; /* Světelný efekt */
+        }
+
+        #stop-button.active {
+            background: #e74c3c; /* Barva pro aktivní zastavení (červená) */
+            color: #111111;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 15px #e74c3c, 0 0 25px #e74c3c, 0 0 35px #e74c3c; /* Světelný efekt */
+        }
+
+        #play-button:hover, #stop-button:hover, #pause-button:hover, #start-button:hover {
+            background: linear-gradient(145deg, #333333, #1a1a1a); /* Reverzní přechod */
+            box-shadow: 0 5px 20px rgba(0, 255, 234, 0.7), 0 0 15px rgba(0, 255, 234, 0.4) inset;
+            color: #ffffff;
+            border-color: #ffffff;
+        }
+
+        /* Odstranění předchozích efektů :before a :after, pokud už nejsou potřeba */
+        #play-button:before, #stop-button:before, #play-button::after, #stop-button::after {
+            content: none;
+        }
+
+        /* Nový styl pro final-grade */
+        .final-grade {
+            margin-top: 20px;
+            font-size: 2.2em;
+            font-weight: bold;
+            color:goldenrod;
+            background-color: transparent;
+        }
+        .retry-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+            color:goldenrod;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .retry-btn:hover {
+            background-color: #45a049;
+        }
+
+        .fullscreen-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0, 255, 234, 0.2);
+            border: 2px solid #00ffea;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .fullscreen-button:hover {
+            background-color: rgba(0, 255, 234, 0.4);
+            box-shadow: 0 0 15px rgba(0, 255, 234, 0.7);
+        }
+
+        .fullscreen-icon {
+            color: #00ffea;
+            font-size: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .fullscreen-button:hover .fullscreen-icon {
+            transform: scale(1.2);
+        }
+
+        /* Styl pro režim celé obrazovky */
+        body:-webkit-full-screen,
+        body:-moz-full-screen,
+        body:-ms-fullscreen,
+        body:fullscreen {
+            background-color: rgba(10, 10, 42, 0.9);
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: auto;
+        }
+
+        #quiz-container:-webkit-full-screen,
+        #quiz-container:-moz-full-screen,
+        #quiz-container:-ms-fullscreen,
+        #quiz-container:fullscreen {
+            box-shadow: 0 0 30px var(--primary-color);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Styl pro scrollbar */
+        body:-webkit-full-screen::-webkit-scrollbar,
+        body:-moz-full-screen::-webkit-scrollbar,
+        body:-ms-fullscreen::-webkit-scrollbar,
+        body:fullscreen::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        body:-webkit-full-screen::-webkit-scrollbar-track,
+        body:-moz-full-screen::-webkit-scrollbar-track,
+        body:fullscreen::-webkit-scrollbar-track {
+            background: rgba(0, 255, 234, 0.1);
+        }
+
+        body:-webkit-full-screen::-webkit-scrollbar-thumb,
+        body:-moz-full-screen::-webkit-scrollbar-thumb,
+        body:fullscreen::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 234, 0.5);
+            border-radius: 5px;
+        }
+
+        /* Styl pro kontejner ukazatele průběhu */
+        #progress-container {
+            width: 100%;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: goldenrod;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: goldenrod;
+        }
+
+        #progress {
+            width: 0;
+            height: 100%;
+            background-color: darkcyan;
+            transition: width 0.3s ease;
+        }
+
+        /* Styl pro otázkový counter */
+        #question-counter {
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #00ffea;
+            text-shadow: 0 0 5px rgba(0, 255, 234, 0.7);
+        }
+
+        #current-question {
+            font-weight: bold;
+        }
+
+        #stats-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 5px 0;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        #correct-answers, #incorrect-answers {
+            padding: 3px 8px;
+            border-radius: 3px;
+            color: white;
+            transition: all 0.2s ease;
+            flex: 1;
+            text-align: center;
+        }
+
+        #correct-answers {
+            background-color: transparent;
+            box-shadow: green;
+            color: darkseagreen;
+        }
+
+        #incorrect-answers {
+            background-color: transparent;
+            box-shadow: red;
+            color: red;
+        }
+
+        .info-row { /* Toto už nebudeme přímo používat, ale nechávám pro referenci */
+            display: flex;
+            justify-content: center; /* Vycentrování prvků vodorovně */
+            align-items: center; /* Svislé zarovnání na střed */
+            gap: 6px; /* Mezera mezi jednotlivými prvky */
+            margin: 0 auto; /* Zarovnání celé řady do středu stránky */
+        }
+
+        #correct-answers, #question-counter, #incorrect-answers, #timer { /* Původní styly - budeme je potlačit novými */
+            padding: 10px;
+            background-color: transparent; /* Volitelný styl pro lepší viditelnost */
+            border-radius: 5px;
+            color: green;
+            text-align: center; /* Text uvnitř prvků bude zarovnán na střed */
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+            font-weight: bold; /* Tučný text pro lepší čitelnost */
+        }
+
+        #incorrect-answers {
+            color: red;
+        }
+
+        .progress-container { /* Duplikát - tento se asi už nepoužívá */
+            display: flex; /* Aktivuje Flexbox */
+            justify-content: center; /* Mezera mezi prvky, aby se roztáhly */
+            align-items: center; /* Vertikální centrování prvků */
+            margin-top: -20px; /* Odsazení shora pro lepší vzhled */
+        }
+
+        #timer {
+            padding: 5px 10px; /* Vnitřní odsazení */
+            background-color: transparent; /* Můžeš změnit barvu pozadí, pokud chceš */
+            font-size: 20px; /* Nastaví velikost písma */
+            color: red; /* Barva textu (např. červená pro časovač) */
+            margin-top: 1px;
+        }
+
+        #question-counter {
+            display: flex; /* Aktivace Flexboxu */
+            justify-content: center; /* Horizontální centrování */
+            align-items: center; /* Vertikální centrování */
+            font-size: 24px; /* Velikost písma pro lepší čitelnost */
+            margin: 20px 0; /* Odsazení nad a pod elementem */
+            text-shadow: none; /* Odstraní textový stín */
+            color: #61dafb; /* Světle modrá pro počítadlo otázek */
+            margin-top: -2px;
+        }
+
+        #current-question {
+            font-weight: bold;
+        }
+
+        #score-percentage {
+            padding: 8px; /* Zmenšené vnitřní odsazení */
+            border-radius: 5px;
+            text-align: center;
+            color: #f0e68c;
+        }
+
+        .score-container { /* Toto už nebudeme přímo používat, ale nechávám pro referenci */
+            display: flex; /* Aktivace Flexboxu */
+            justify-content: center; /* Horizontální centrování */
+            align-items: center; /* Vertikální centrování */
+            font-size: 10px; /* Velikost písma pro lepší čitelnost */
+            margin: 0; /* Odsazení kolem kontejneru */
+            color: #adb5bd;
+        }
+
+        .score-label { /* Toto už nebudeme přímo používat, ale nechávám pro referenci */
+            margin-right: 5px; /* Mezera mezi štítkem a hodnotou */
+            font-weight: bold; /* Ztučnění textu „Skóre“ */
+            color: #f0a500; /* Oranžová pro štítek skóre */
+        }
+
+        .score-value { /* Toto už nebudeme přímo používat, ale nechávám pro referenci */
+            color: #61dafb; /* Světle modrá pro hodnotu skóre */
+        }
+
+        #pause-button, #start-button {
+            background: linear-gradient(145deg, #111111, #1a1a1a); /* Jemný tmavý přechod */
+            color: #f1c40f;
+            border: 2px solid #f1c40f;
+            padding: 12px 25px;
+            font-size: 13px;
+            font-family: 'Orbitron', sans-serif;
+            border-radius: 20px; /* Zakulacený futuristický tvar */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: ;
+            letter-spacing: 2px; /* Rozšíření písmen pro futuristický vzhled */
+            position: relative;
+            overflow: hidden;
+            font-weight: bold; /* Tučný text */
+            border-color: #f1c40f; /* Zlatý rámeček při hoveru */
+        }
+
+        #pause-button {
+            background-color: #f0ad4e; /* Oranžová */
+            color: green;
+            border: 2px solid #f1c40f;
+        }
+
+        #pause-button:hover {
+            background-color: #ec971f; /* Tmavší oranžová při hoveru */
+            transform: scale(1.08); /* Mírné zvětšení při hoveru */
+            border-color: #f1c40f; /* Zlatý rámeček při hoveru */
+            box-shadow: 0 12px 30px rgba(0, 255, 255, 0.7), 0 0 15px rgba(0, 255, 255, 0.5); /* Silnější tyrkysový glow efekt */
+        }
+
+        #start-button {
+            background-color: #5cb85c; /* Zelená */
+            color: green;
+            display: none; /* Skryté tlačítko, když není potřeba */
+            border-color: #ffdd57; /* Světlejší zelený rámeček */
+        }
+
+        #start-button:hover {
+            background-color: #449d44; /* Tmavší zelená při hoveru */
+            transform: scale(1.08); /* Mírné zvětšení při hoveru */
+            border-color: #ffdd57; /* Tmavší zelený rámeček při hoveru */
+            box-shadow: 0 12px 30px rgba(255, 215, 0, 0.7), 0 0 15px rgba(255, 215, 0, 0.5); /* Zlatý glow efekt */
+        }
+
+        /* Tlačítka vedle sebe s černým pozadím */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 6px; /* Větší mezera mezi tlačítky */
+            margin-top: -24px;
+            padding: 10px;
+            border-color: #f1c40f; /* Zlatý rámeček při hoveru */
+        }
+        @media screen and (max-width: 768px) {
+            body {
+                font-size: 14px;
+                padding: 5px;
+                margin: 0;
+                background-color: #1a1a2e;
+                color: #16e0bd;
+            }
+
+            #quiz-container {
+                width: 100%;
+                max-width: 100%;
+                padding: 10px;
+                display: flex;
+                flex-direction: column;
+                height: 100vh;
+                justify-content: flex-start;
+            }
+
+            h1 {
+                font-size: 1.6em;
+                margin-bottom: 10px;
+                text-align: center;
+            }
+
+            .question-text {
+                font-size: 1.3em;
+                margin-bottom: 10px;
+                text-align: center;
+            }
+
+            .question-image {
+                max-height: 25vh;
+                margin: 0 auto 10px;
+                display: block;
+                border: 2px solid #16e0bd;
+                border-radius: 10px;
+            }
+
+            .answers-container {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                grid-gap: 8px;
+                margin-bottom: 15px;
+            }
+
+            .answer-button {
+                padding: 8px;
+                font-size: 0.8em;
+                height: auto;
+                min-height: 40px;
+                border-radius: 5px;
+                border: none;
+                background-color: #00FF00;
+                color: black;
+                font-weight: bold;
+            }
+
+            .answer-button:hover {
+                background-color: olive;
+                transform: translateY(-2px);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                color: black;
+                font-weight: bold;
+            }
+
+            .answer-button.correct {
+                background-color: green;
+                color: black;
+                font-weight: bold;
+            }
+
+            .answer-button.incorrect {
+                background-color: red;
+                color: black;
+                font-weight: bold;
+            }
+
+            .answer-button.show-correct {
+                background-color: green;
+                color: black;
+                font-weight: bold;
+            }
+
+            #navigation {
+                margin-top: 10px;
+            }
+
+            /* Upravené styly pro mobilní zařízení - statistiky */
+            #stats-display-container {
+                flex-direction: column; /* Na mobilech pod sebou */
+                gap: 5px; /* Menší mezera */
+                font-size: 0.9em; /* Menší písmo */
+                margin-top: 5px;
+            }
+
+            #question-counter-display,
+            #correct-answers-display,
+            #incorrect-answers-display,
+            #score-percentage-display,
+            #timer-display {
+                width: 90%; /* Zaberou více šířky */
+                justify-content: space-between; /* Obsah bude roztažen do stran */
+            }
+
+            /* Nový flexbox kontejner pro audio a ovládací prvky na mobilu */
+            #controls-row {
+                flex-direction: column; /* Na mobilech pod sebou */
+                gap: 5px;
+            }
+
+            #play-button,
+            #stop-button,
+            #pause-button,
+            #start-button {
+                width: 90%; /* Zaberou více šířky */
+                padding: 8px;
+                font-size: 1.1em;
+                height: auto; /* Důležité pro správné zobrazení textu */
+                min-height: 30px; /* Minimální výška */
+            }
+
+            #volume-control {
+                width: 80%; /* Širší slider na mobilu */
+                margin-top: 10px;
+            }
+
+            .fullscreen-button {
+                top: 10px;
+                right: 120px;
+                width: 25px;
+                height: 25px;
+                margin-left: -20
+            }
+
+            .fullscreen-icon {
+                font-size: 17px;
+                margin-left: -20
+            }
+        }
+        #progress-container {
+            width: 100%;
+            margin-top: -7px; /* Zmenšená mezera nahoře */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #progress-bar {
+            width: 90%; /* Zúžená šířka */
+            height: 16px; /* Zmenšená výška */
+            background-color: goldenrod;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(255, 215, 0, 0.5); /* Přidání lehkého stínu */
+            margin: 20px auto; /* Vycentrování */
+        }
+
+        #progress {
+            width: 0; /* Začíná na 0% */
+            height: 100%;
+            background-color: darkcyan;
+            transition: width 0.3s ease; /* Plynulý přechod */
+            color: white; /* Bílý text pro kontrast */
+            text-align: center; /* Vycentrování textu */
+            font-weight: bold; /* Tučné písmo pro čitelnost */
+            line-height: 16px; /* Vycentrování na výšku */
+            border-radius: 5px 0 0 5px; /* Zaoblené rohy vlevo */
+        }
+
+        .info-row { /* Už není potřeba, nahrazeno #stats-display-container */
+            display: flex;
+            flex-direction: center; /* Změněno na sloupec pro mobil */
+            align-items: center; /* Svislé zarovnání na střed */
+            gap: 10px; /* Zmenšená mezera mezi prvky */
+            margin: 0 auto; /* Zarovnání celé řady do středu stránky */
+        }
+
+        #correct-answers, #question-counter, #incorrect-answers, #timer { /* Původní styly - nyní je přepíšeme v #stats-display-container */
+            padding: 8px; /* Zmenšené vnitřní odsazení */
+            background-color: transparent;
+            border-radius: 5px;
+            color: green;
+            text-align: center;
+            box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+            font-weight: bold;
+            font-size: 16px; /* Zmenšená velikost písma */
+        }
+
+        #incorrect-answers {
+            color: red;
+        }
+
+        .progress-container { /* Duplikát - nepoužívá se */
+            display: flex;
+            flex-direction: center; /* Změněno na sloupec pro lepší přehlednost */
+            justify-content: center; /* Vodorovné centrování */
+            align-items: center; /* Vertikální centrování */
+            margin-top: -20; /* Zrušení negativního odsazení */
+        }
+
+        #timer { /* Přepsáno v #stats-display-container */
+            padding: 5px 8px; /* Zmenšené vnitřní odsazení */
+            background-color: transparent;
+            font-size: 14px; /* Zmenšená velikost písma */
+            color: red;
+            margin-top: 5px; /* Zvětšené odsazení nahoře */
+        }
+
+        #question-counter { /* Přepsáno v #stats-display-container */
+            font-size: 14px; /* Zmenšená velikost písma pro mobil */
+            margin: 10px 0; /* Odsazení nad a pod elementem */
+            color: #61dafb; /* Světle modrá pro počítadlo otázek */
+            margin-top: -2px;
+        }
+
+        #current-question {
+            font-weight: bold;
+        }
+
+        #score-percentage { /* Přepsáno v #stats-display-container */
+            padding: 8px; /* Zmenšené vnitřní odsazení */
+            border-radius: 5px;
+            text-align: center;
+            color: #f0e68c;
+        }
+
+        .score-container { /* Přepsáno v #stats-display-container */
+            font-size: 8px; /* Zmenšená velikost písma pro mobil */
+            color: #adb5bd;
+        }
+
+        .score-label { /* Přepsáno v #stats-display-container */
+            margin-right: 3px; /* Zmenšená mezera mezi štítkem a hodnotou */
+            color: #f0a500; /* Oranžová pro štítek skóre */
+        }
+
+        .score-value { /* Přepsáno v #stats-display-container */
+            color: #61dafb; /* Světle modrá pro hodnotu skóre */
+        }
+        /* Kontejner pro otázky */
+        #question-container {
+
+        }
+
+        /* Optimalizace pro výkon */
+        #question-container {
+            backface-visibility: hidden;
+            perspective: 100px;
+        }
+        /* Přidejte nové styly pro nové funkce */
+        .difficulty-selector {
+            margin-bottom: 20px;
+        }
+
+        .achievement {
+            background-color: gold;
+            color: black;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+        }
+
+        .hint-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .hint-button:hover {
+            background-color: #45a049;
+        }
+
+        #statistics-container {
+            margin-top: 20px;
+        }
+
+        #performance-chart {
+            width: 100%;
+            height: 300px;
+        }
+        #my-div.fullscreen {
+            position: fixed; /* Fixuje div na obrazovce */
+            top: 0;
+            left: 0;
+            width: 100vw; /* Šířka celé obrazovky */
+            height: 100vh; /* Výška celé obrazovky */
+            background-color: white; /* Barva pozadí */
+            z-index: 1000; /* Zajišťuje, že je nad ostatními elementy */
+        }
+
+        /* Nové styly pro startovací obrazovku */
+        #start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.95); /* Tmavší, téměř černá */
+            color: #00ffea;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999; /* Zajištění, že bude nad vším */
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+        }
+
+        #start-screen h2 {
+            font-size: 3em;
+            margin-bottom: 30px;
+            text-shadow: 0 0 15px #00ffea, 0 0 25px #00ffea;
+        }
+
+        #start-game-button {
+            background: linear-gradient(145deg, #00ffea, #00b3a3);
+            color: #1a1a1a;
+            border: 2px solid #00ffea;
+            padding: 15px 35px;
+            font-size: 1.8em;
+            font-weight: bold;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 255, 234, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        #start-game-button:hover {
+            background: linear-gradient(145deg, #00b3a3, #00ffea);
+            box-shadow: 0 0 20px rgba(0, 255, 234, 0.8), 0 0 30px rgba(0, 255, 234, 0.6);
+            transform: scale(1.05);
+        }
+
+        /* Skrytí elementu s class hidden */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Styly pro hudební tlačítka - aktivní stav */
+        #play-button.active {
+            background: #00ffea; /* Zelený neon pro aktivní play */
+            color: #111111;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 15px #00ffea, 0 0 25px #00ffea; /* Silný neonový efekt */
+        }
+
+        #stop-button.active {
+            background: #e74c3c; /* Červený neon pro aktivní stop */
+            color: #111111;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 15px #e74c3c, 0 0 25px #e74c3c; /* Silný neonový efekt */
+        }
+    </style>
+</head>
+<body>
+    <div id="start-screen">
+        <h2>Vítej ve Futuristickém Kvízu!</h2>
+        <button id="start-game-button">START HRY</button>
+    </div>
+
+    <div id="quiz-container">
+        <h1>Futuristický Cestovatelský Kvíz</h1>
+
+        <div id="question-container" class="question-container">
+        </div>
+
+        <div id="stats-display-container">
+            <div id="question-counter-display">
+                Otázka <span id="current-question">1</span> z <span id="total-questions-display"></span>
+            </div>
+            <div id="correct-answers-display">Správné: 0</div>
+            <div id="incorrect-answers-display">Špatné: 0</div>
+            <div id="score-percentage-display">Skóre: 0.00%</div>
+            <div id="timer-display">Čas: 20 s</div>
+        </div>
+
+        <div id="progress-container">
+            <div id="progress-bar">
+                <div id="progress" value="0" max="100"></div>
+            </div>
+        </div>
+        
+        <div id="controls-row">
+            <button id="play-button">Přehrát</button>
+            <button id="stop-button">Zastavit</button>
+            <button id="pause-button">Pozastavit Odpočet</button>
+            <input type="range" id="volume-control" min="0" max="1" step="0.00001" value="0.01">
+            <div id="fullscreen-button" class="fullscreen-button">
+                <span class="fullscreen-icon">↔</span> 
+            </div>
+        </div>
+        <div id="navigation" style="display:none;"></div> 
+
+        <div id="achievements-container">
+        </div>
+
+        <div id="results-container" class="hidden">
+            <h2>Výsledky kvízu</h2>
+            <table id="results-table">
+                <thead>
+                    <tr>
+                        <th>Otázka</th>
+                        <th>Vaše odpověď</th>
+                        <th>Správná odpověď</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+            <div id="final-score"></div>
+            <div class="final-grade" id="final-grade"></div>
+            <button class="retry-btn" onclick="restartGame()">Nová Hra. Nová Šance.</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            { question: "Jaké je moje 'jméno'?", answers: ["Jirka", "Petr", "Tomáš", "Ota", "Jan", "Marek", "Martin", "Jozef"], correctAnswer: 0, image: "https://img36.rajce.idnes.cz/d3603/10/10185/10185286_0147349ad505c43a2d9f6eb372624417/images/CIMG0054.jpg?ver=3" },
+            { question: "Jaké je hlavní město Francie?", answers: ["Berlin", "Madrid", "Paris", "Rome", "Lisbon", "Brussels", "Amsterdam", "Vienna"], correctAnswer: 2, image: "https://objevimesvet.cz/wp-content/uploads/2017/06/OS_Par%CC%8Ci%CC%81z%CC%8C_s_koc%CC%8Ca%CC%81rkem_8.jpg" },
+            { question: "Jaké je hlavní město Itálie?", answers: ["Milán", "Florencie", "Řím", "Benátky", "Neapol", "Turín", "Palermo", "Bologna"], correctAnswer: 2, image: "https://www.parkovanir7.cz/archive_files/Clanky/Tipy_Rim/Koloseum_Rim_800_2.jpg" },
+            { question: "Jaké je hlavní město Japonska?", answers: ["Osaka", "Kyoto", "Tokyo", "Hiroshima", "Nagoya", "Yokohama", "Sapporo", "Fukuoka"], correctAnswer: 2, image: "https://i.ck.cz/f/91946/90-800-600.jpg" },
+            { question: "Jaké je hlavní město Německa?", answers: ["Hamburk", "Mnichov", "Berlín", "Kolín", "Frankfurt", "Stuttgart", "Düsseldorf", "Dresden"], correctAnswer: 2, image: "https://www.irozhlas.cz/sites/default/files/styles/zpravy_facebook/public/images/02425582.jpeg" },
+            { question: "Jaké je hlavní město Španělska?", answers: ["Barcelona", "Sevilla", "Madrid", "Valencie", "Bilbao", "Malaga", "Granada", "San Sebastián"], correctAnswer: 2, image: "https://slantour.cz/foto/full/3333-madrid.jpg" },
+            { question: "Jaké je hlavní město Kanady?", answers: ["Toronto", "Vancouver", "Ottawa", "Montreal", "Calgary", "Edmonton", "Quebec", "Victoria"], correctAnswer: 2, image: "https://traveltables-s3.ams3.cdn.digitaloceanspaces.com/cities/niagara-falls_canada_15298595745609768085b2fcdf66e895.jpg" },
+            { question: "Jaké je hlavní město Austrálie?", answers: ["Sydney", "Melbourne", "Canberra", "Perth", "Adelaide", "Hobart", "Darwin", "Brisbane"], correctAnswer: 2, image: "https://www.cksen.cz/modules/articles/images/800/opera-sydney.jpeg" },
+            { question: "Jaké je hlavní město Brazílie?", answers: ["Rio de Janeiro", "São Paulo", "Brasília", "Salvador", "Fortaleza", "Recife", "Belo Horizonte", "Manaus"], correctAnswer: 2, image: "https://www.radicestujeme.eu/img/exphoto/Brasilia_aerea_estadionacional.jpg" },
+            { question: "Jaké je hlavní město Ruska?", answers: ["Sankt Petersburg", "Novosibirsk", "Moskva", "Jekatěrinburg", "Kazan", "Nizhny Novgorod", "Samara", "Ufa"], correctAnswer: 2, image: "https://torussia.travel/a/torussiatravel/files/multifile/2353/preview_odezhda_optom_moskva.jpg" },
+            { question: "Jaké je hlavní město Číny?", answers: ["Šanghaj", "Peking", "Hong Kong", "Guangzhou", "Shenzhen", "Chengdu", "Xi'an", "Wuhan"], correctAnswer: 1, image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Forbidden_City_Beijing_%283019178959%29.jpg/800px-Forbidden_City_Beijing_%283019178959%29.jpg" },
+            { question: "Kolik nohou má pavouk?", answers: ["4", "6", "8", "10", "12", "14", "16", "18"], correctAnswer: 2, image: "https://karnevalovysvet.cz/photos/produkty/f/3/3147.jpg?m=1533130034" },
+            { question: "Kdo napsal román '1984'?", answers: ["Aldous Huxley", "George Orwell", "Ernest Hemingway", "J.K. Rowling", "F. Scott Fitzgerald", "John Steinbeck", "Herman Melville", "Mark Twain"], correctAnswer: 1, image: "https://img-cloud.megaknihy.cz/4450989-large/bbd6dbb870a4741df8d7ce080a3b9fc9/strazci-ruze.jpg" },
+            { question: "Jaký je největší oceán na světě?", answers: ["Atlantický", "Indický", "Arktický", "Tichý", "Severní ledový", "Karibský", "Mediterránní", "Baltský"], correctAnswer: 3, image: "https://obrazky.superzajezdy.cz/hotels/plavba-z-anglie-pres-atlantsky-ocean-na-ostrovy-karibiku-na-lodi-independence-of-the-seas/1971384.jpg" },
+            { question: "Kdo byl prvním prezidentem Československé republiky?", answers: ["Tomáš G. Masaryk", "Edvard Beneš", "Václav Havel", "Miloš Zeman", "Jan Masaryk", "Ladislav Štoll", "Klement Gottwald", "Antonín Novotný"], correctAnswer: 0, image: "https://www.zelenavystava.cz/images/Vladci/11a.jpg" },
+            { question: "Kolik planet je v naší sluneční soustavě?", answers: ["7", "8", "9", "10", "11", "12", "13", "14"], correctAnswer: 1, image: "https://astronomia.zcu.cz/obr/planety/soustava/solar_sys.jpg" },
+            { question: "Které zvíře je nejrychlejší na souši?", answers: ["Leopard", "Gepard", "Tygr", "Slon", "Kůň", "Antilopa", "Hroch", "Medvěd"], correctAnswer: 1, image: "https://www.wallpaper.cz/primo/ir2/gepard_3--800x600.jpg" },
+            { question: "Jaká je nejvyšší hora na světě?", answers: ["K2", "Makalu", "Everest", "Kilimandžáro", "Lhotse", "Manaslu", "Nanga Parbat", "Dhaulagiri"], correctAnswer: 2, image: "https://d15-a.sdn.cz/d_15/c_img_F_G/kkUVZf.jpeg?fl=cro,0,74,800,450%7Cres,722,,1%7Cwebp,75" },
+            { question: "Jaké je hlavní město České republiky?", answers: ["Brno", "Ostrava", "Plzeň", "Praha", "Liberec", "Hradec Králové", "Olomouc", "Ústí nad Labem"], correctAnswer: 3, image: "https://images.wallpaperscraft.com/image/single/czech_republic_czech_bridge_79302_800x600.jpg" },
+            { question: "Který stát je největší na světě?", answers: ["Kanada", "Čína", "USA", "Rusko", "Brazílie", "Austrálie", "Indie", "Argentina"], correctAnswer: 3, image: "https://torussia.travel/a/torussiatravel/files/multifile/2353/preview_odezhda_optom_moskva.jpg" },
+            { question: "Které zvíře je symbolem Austrálie?", answers: ["Klokan", "Koala", "Panda", "Slon", "Krokodýl", "Vombat", "Kasuár", "Dingo"], correctAnswer: 0, image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Coat_of_Arms_of_Australia.svg/800px-Coat_of_Arms_of_Australia.svg.png" },
+            { question: "Kdo vyhrál mistrovství světa v hokeji v České republice v roce 2024?", answers: ["Kanada", "Švédsko", "Finsko", "Česká republika", "Rusko", "USA", "Německo", "Švýcarsko"], correctAnswer: 3, image: "https://1gr.cz/fotky/idnes/24/053/vidw/IHAc3ea2dd601_111523_5337473.jpg" },
+            { question: "Které město je známé jako 'město piva' v České republice?", answers: ["Brno", "Plzeň", "Ostrava", "České Budějovice", "Praha", "Liberec", "Karlovy Vary", "Hradec Králové"], correctAnswer: 1, image: "https://www.karelsury.cz/fotky/Gambrinus.png" },
+            { question: "Kdo namaloval Mona Lisu?", answers: ["Vincent van Gogh", "Claude Monet", "Pablo Picasso", "Leonardo da Vinci", "Raphael", "Caravaggio", "Titian", "Rembrandt"], correctAnswer: 3, image: "https://www.ikea.com/cz/cs/images/products/pjaetteryd-obraz-mona-lisa-2__1239117_pe918777_s5.jpg?f=xxs" },
+            { question: "Jaký je největší městský park na světě?", answers: ["Central Park", "Hyde Park", "Stanley Park", "Banff National Park", "Golden Gate Park", "Tiergarten", "Namsan Seoul Tower Park", "Yoyogi Park"], correctAnswer: 3, image: "https://praha-dolnipocernice.cz/sites/default/files/styles/maxsize/public/staticke_stranky/p19pjtqhk71ef31eot7hv56s3vb4.jpg?itok=gO9rUJFE" },
+            { question: "Co je největší druh ryby na světě?", answers: ["Žralok bílý", "Kloun (Nemo)", "Žralok velrybí", "Manta", "Žralok hammerhead", "Obrovský sumec", "Jasnoočko", "Kapr"], correctAnswer: 2, image: "https://cdn.prod.website-files.com/64bd94de0b26820044ae16e2/6502f965eb6cc50e694de0d0_F28639157-XS-Mexico-whale-shark.jpeg" },
+            { question: "Kde se nachází Velká čínská zeď?", answers: ["Japonsko", "Čína", "Korejský poloostrov", "Vietnam", "Tajvan", "Hong Kong", "Mongolsko", "Nepál"], correctAnswer: 1, image: "https://d15-a.sdn.cz/d_15/c_img_F_F/L7wBBdE.jpeg?fl=cro,0,40,800,450%7Cres,722,,1%7Cwebp,75" },
+            { question: "Kdo je autorem knihy 'Harry Potter'?", answers: ["J.R.R. Tolkien", "J.K. Rowling", "C.S. Lewis", "Philip Pullman", "J.D. Salinger", "George R.R. Martin", "J.R. Ward", "Stephen King"], correctAnswer: 1, image: "https://img.blesk.cz/static/old_abc/imgdb/original/phpcW0RS2.jpg" },
+            { question: "Jaké je největší město v České republice?", answers: ["Praha", "Brno", "Plzeň", "Ostrava", "Olomouc", "Hradec Králové", "Liberec", "Ústí nad Labem"], correctAnswer: 0, image: "https://www.wallpaper.cz/primo/ir2/praha--800x600.jpg" },
+            { question: "Který hrad je známý jako 'Hrad nad hrady'?", answers: ["Karlštejn", "Český Krumlov", "Hluboká", "Křivoklát", "Branov", "Konečná", "Pardubice", "Sázava"], correctAnswer: 0, image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Karlstejn_castle_Czech_Republic.JPG/800px-Karlstejn_castle_Czech_Republic.JPG" },
+            { question: "Jaké je nejvyšší pohoří v České republice?", answers: ["Krkonoše", "Šumava", "Českomoravská Vrchovina", "Orlické hory", "Jizerské hory", "Bílé Karpaty", "Beskydy", "Pálava"], correctAnswer: 0, image: "https://cms.atravelfactory.com/assets/NNP/krkonose_winter-2285329_1280.jpg" },
+            { question: "Která řeka protéká Prahou?", answers: ["Vltava", "Labe", "Morava", "Ohře", "Sázava", "Dyje", "Berounka", "Elbe"], correctAnswer: 0, image: "https://www.pujcovnaraftu.cz/images/vltava/U-Rybu.jpg" },
+            { question: "Jaké je nejstarší město v České republice?", answers: ["Brno", "Praha", "Plzeň", "Olomouc", "Hradec Králové", "Ústí nad Labem", "Liberec", "České Budějovice"], correctAnswer: 1, image: "https://www.wallpaper.cz/primo/ir2/praha--800x600.jpg" },
+            { question: "Která česká města jsou známá výrobou piva?", answers: ["Plzeň", "České Budějovice", "Brno", "Praha", "Hradec Králové", "Liberec", "Ostrava", "Olomouc"], correctAnswer: 0, image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Sedlackova_9_Plzen.jpg/800px-Sedlackova_9_Plzen.jpg" },
+            { question: "Který český národní park je známý jako 'Šumava'?", answers: ["Šumava", "Krkonošsko-jesenická", "Českomoravská Vrchovina", "Orlické hory", "Jizerské hory", "Bílé Karpaty", "Prha", "Brno"], correctAnswer: 0, image: "https://lh4.googleusercontent.com/proxy/ET0yj2cwC75zldYIFBFMPpc9W32G9LWSNT6dZiWHGKqU6VeQ4Vq5IxT1rZiyVbXt147TEVxIb6KUGR4hibXXlDuzKO10bfPynv2ztzHB1-dHyjs" },
+            {"question": "Který hrad je známý jako 'Karlštejn'?", "answers": ["Karlštejn", "Konopiště", "Křivoklát", "Pernštejn", "Zvíkov", "Bezděz", "Špilberk", "Hluboká"], "correctAnswer": 0, "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Karlstejn_castle_Czech_Republic.JPG/800px-Karlstejn_castle_Czech_Republic.JPG"},
+            {"question": "Který zámek je známý svou renesanční architekturou a je spojený s českou šlechtou?", "answers": ["Český Krumlov", "Hluboká nad Vltavou", "Lednice", "Třeboň", "Bouzov", "Dobříš", "Telč", "Kroměříž"], "correctAnswer": 7, "image": "https://www.penzion-u-pelejovych.cz/wp-content/uploads/2020/09/15.jpg"},
+            {"question": "Který hrad je nejvýše položeným hradem v České republice?", "answers": ["Loket", "Kašperk", "Trosky", "Helfštýn", "Orlík", "Bouzov", "Bezděz", "Točník"], "correctAnswer": 1, "image": "https://www.skvelecesko.cz/upload/1685030322_646f85b26c30e_full.jpg"},
+            {"question": "Který zámek je spojen s rodem Schwarzenbergů a nachází se v jižních Čechách?",
+            "answers": ["Hluboká nad Vltavou", "Konopiště", "Český Krumlov", "Zvíkov", "Orlík", "Křivoklát", "Karlštejn", "Lednice"], "correctAnswer": 0, "image": "https://www.autoweb.cz/wp-content/uploads/2020/06/hluboka-1100x618.jpg"},
+            {"question": "Který hrad je považován za jeden z nejstarších kamenných hradů v Česku?",
+            "answers": ["Zvíkov", "Helfštýn", "Křivoklát", "Pernštejn", "Loket", "Bezděz", "Trosky", "Lipnice"],
+            "correctAnswer": 4,
+            "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Loket0809.JPG/800px-Loket0809.JPG"},
+            {"question": "Který hrad je známý svou unikátní gotickou architekturou a dominantní věží?",
+            "answers": ["Karlštejn", "Kost", "Špilberk", "Bezděz", "Trosky", "Kašperk", "Točník", "Loket"],
+            "correctAnswer": 4, "image": "https://www.turistik.cz/cz/kraje/liberecky-kraj/okres-semily/rovensko-pod-troskami/hrad-trosky/galerie/ir/files/gallery/689/5939--c800x600.jpg"},
+            {"question": "Který zámek je spojen s Albrechtem z Valdštejna a nachází se v severních Čechách?",
+            "answers": ["Frýdlant", "Konopiště", "Hluboká nad Vltavou", "Český Krumlov", "Kuks", "Litomyšl", "Bouzov", "Kost"], "correctAnswer": 0, "image": "https://www.mistopisy.cz/modules/pruvodce/media/interest/562/interest.jpg"},
+            {"question": "Který hrad byl známý jako sídlo českých králů a je spojován s císařem Karlem IV.?",
+            "answers": ["Karlštejn", "Pražský hrad", "Křivoklát", "Hluboká nad Vltavou", "Pernštejn", "Zvíkov", "Orlík", "Konopiště"], "correctAnswer": 1, "image": "https://images.wallpaperscraft.com/image/single/czech_republic_czech_bridge_79302_800x600.jpg" },
+            {"question": "Který zámek v Německu je známý jako inspirace pro pohádkové zámky Disney?",
+            "answers": ["Neuschwanstein", "Heidelberg", "Sanssouci", "Hohenzollern", "Linderhof", "Nymphenburg", "Schwerin", "Charlottenburg"],"correctAnswer": 0,"image": "https://www.parkovanir7.cz/archive_files/Clanky/Bavorsko/Bavorsko_-Zamek_Neuschwanstein800.jpg"},
+            {"question": "Který francouzský zámek se nachází v údolí Loiry a je považován za jeden z nejkrásnějších na světě?","answers": ["Château de Chambord", "Château de Versailles", "Château de Chenonceau", "Château de Fontainebleau", "Château de Cheverny", "Château d'Amboise", "Château de Blois", "Château de Sully-sur-Loire"],"correctAnswer": 2,"image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Chateau_de_Chenonceau_2008E.jpg/800px-Chateau_de_Chenonceau_2008E.jpg"},
+            {"question": "Který hrad v Anglii je sídlem britské královské rodiny a nachází se nedaleko Londýna?",
+            "answers": ["Windsor", "Edinburgh", "Warwick", "Leeds", "Dover", "Balmoral", "Alnwick", "Arundel"],
+            "correctAnswer": 0,"image": "https://ceskekormidlo.cz/wp-content/uploads/2021/10/117460-800x600.jpeg"},
+            {"question": "Který italský hrad se nachází ve městě Neapol a je známý jako Castel dell'Ovo?",
+            "answers": ["Castel dell'Ovo", "Castel Sant'Angelo", "Castel Nuovo", "Castello Sforzesco", "Castello di Miramare", "Castelvecchio", "Rocca di Angera", "Castel del Monte"],"correctAnswer": 0,"image": "https://w0.peakpx.com/wallpaper/785/270/HD-wallpaper-castle-dell-ovo-naples-italy-2013-04-castle-12-italy.jpg"},
+            {"question": "Který španělský palácový komplex je známý jako 'Alhambra'?","answers": ["Alhambra", "El Escorial", "Palacio Real", "Mezquita-Catedral de Córdoba", "Generalife", "La Giralda", "Alcázar de Sevilla", "Sagrada Familia"],"correctAnswer": 0,"image": "https://dcontent.inviacdn.net/shared/img/web-830/2017/8/23/m0/453161.jpg"},
+            {
+                "question": "Který český hrad je známý svou bílou věží a renesančními sgrafity?",
+                "answers": ["Bouzov", "Český Šternberk", "Rožmberk", "Pernštejn", "Kokořín", "Bítov", "Rabí", "Buchlov"],
+                "correctAnswer": 1,
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/%C4%8Cesk%C3%BD_%C5%A0ternberk-hrad2.JPG/250px-%C4%8Cesk%C3%BD_%C5%A0ternberk-hrad2.JPG"
+            },
+            {
+                "question": "Který zámek je známý svými rozsáhlými zahradami a barokní architekturou?",
+                "answers": ["Valtice", "Lednice", "Kroměříž", "Litomyšl", "Náměšť nad Oslavou", "Jindřichův Hradec", "Červená Lhota", "Opočno"],
+                "correctAnswer": 1,
+                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Lednice_%28Eisgrub%29_-_z%C3%A1mek.JPG/250px-Lednice_%28Eisgrub%29_-_z%C3%A1mek.JPG"
+            },
+            {
+                "question": "Který hrad je známý svou mohutnou válcovou věží a nachází se v Českém ráji?",
+                "answers": ["Trosky", "Kost", "Bezděz", "Valdštejn", "Kokořín", "Houska", "Svojanov", "Bouzov"],
+                "correctAnswer": 1,
+                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Kost-letecky-pohled.jpg/1280px-Kost-letecky-pohled.jpg"
+            },
+            {
+                "question": "Který zámek je spojen s rodem Rožmberků a nachází se v jižních Čechách?",
+                "answers": ["Český Krumlov", "Hluboká nad Vltavou", "Jindřichův Hradec", "Orlík", "Blatná", "Červená Lhota", "Kratochvíle", "Bechyně"],
+                "correctAnswer": 0,
+                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/%C4%8Cesk%C3%BD_Krumlov%2C_historick%C3%A9_j%C3%A1dro.jpg/1920px-%C4%8Cesk%C3%BD_Krumlov%2C_historick%C3%A9_j%C3%A1dro.jpg"
+            },
+            {
+                "question": "Který hrad je známý svou gotickou kaplí a nachází se nedaleko Prahy?",
+                "answers": ["Karlštejn", "Křivoklát", "Točník", "Žebrák", "Konopiště", "Český Šternberk", "Kokořín", "Krakovec"],
+                "correctAnswer": 1,
+                "image": "https://cdn.kudyznudy.cz/files/ac/ac63046e-8669-4f50-935d-905e2324f392.webp?v=20221012195443"
+            },
+            {
+                "question": "Který zámek je známý svou barokní architekturou a rozsáhlým parkem s fontánami?",
+                "answers": ["Duchcov", "Jaroměřice nad Rokytnou", "Slavkov u Brna", "Mikulov", "Valtice", "Dobříš", "Náchod", "Zákupy"],
+                "correctAnswer": 1,
+                "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Jarom%C4%9B%C5%99ice_z%C3%A1mek_7.jpg/250px-Jarom%C4%9B%C5%99ice_z%C3%A1mek_7.jpg"
+            },
+            {
+                "question": "Který hrad je známý svou polohou na skalním ostrohu a výhledem na řeku Vltavu?",
+                "answers": ["Zvíkov", "Orlík", "Hluboká nad Vltavou", "Rožmberk", "Český Šternberk", "Konopiště", "Bouzov", "Pernštejn"],
+                "correctAnswer": 0,
+                "image": "https://www.hrad-zvikov.cz/pamatky/zvikov/fotogalerie/zvikov-soucasny/image-thumb__5573__SightGalleryThumbnail/01-pisecka-brana-a-hlaska-2.webp"
+            },
+            {
+                "question": "Který zámek je známý svou rokokovou architekturou a nachází se v západních Čechách?",
+                "answers": ["Zákupy", "Nové Hrady", "Mnichovo Hradiště", "Duchcov", "Kynžvart", "Libochovice", "Veltrusy", "Manětín"],
+                "correctAnswer": 7,
+                "image": "http://www.zamky-hrady.cz/1/img/manetin_poz.jpg"
+            },
+            {
+                "question": "Který hrad je známý svou expozicí středověkých mučicích nástrojů?",
+                "answers": ["Loket", "Špilberk", "Křivoklát", "Kost", "Bouzov", "Svojanov", "Valdštejn", "Kunětická hora"],
+                "correctAnswer": 1,
+                "image": "https://slevomat.sgcdn.cz/images/t/660/16/72/16723348-418d10.webp"
+            },
+            {
+                "question": "Který zámek je známý svou empírovou architekturou a rozsáhlým anglickým parkem?",
+                "answers": ["Kačina", "Sychrov", "Hluboká nad Vltavou", "Opočno", "Nové Město nad Metují", "Hrádek u Nechanic", "Velké Losiny", "Jindřichův Hradec"],
+                "correctAnswer": 0,
+                "image": "https://www.cestyapamatky.cz/img/galerie/pam/1047/dji_0003.jpg"
+            }
+        ]; // 58 otázek puvodně bylo 48 otazek
+
+        // Funkce pro získání aktuálního času ve formátu HH:MM:SS
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toTimeString().split(' ')[0];
+        }
+
+        // Původní console.log funkce
+        const originalConsoleLog = console.log;
+
+        // Funkce pro logování s časem
+        function logWithTime(message) {
+            originalConsoleLog.call(console, `[${getCurrentTime()}] ${message}`);
+        }
+
+        // Přepsání globální console.log
+        console.log = logWithTime;
+
+        // Konstanty a globální proměnné
+        const totalQuestions = quizData.length; // Celkový počet otázek (dynamicky z quizData)
+        let currentQuestion = 0; // Aktuální index otázky (0-indexed)
+        let userAnswers = [];
+        let isPlaying = false;
+        let score = 0;
+        let correctAnswers = 0;
+        let incorrectAnswers = 0;
+
+        // Proměnné pro časovač
+        let timer;
+        const timeLimit = 20; // 20 sekund na otázku
+        let timeLeft;
+        let isPaused = false;
+        let pauseButton;
+        // Tlačítko start-button je nyní čistě interní, není v HTML DOM
+        // let startButton; // Dříve zde, nyní je v HTML, ale s display:none, pro případné budoucí použití
+
+
+        // Nové proměnné pro rozšířené funkce
+        let currentDifficulty = 'medium';
+        let userPerformance = [];
+        let achievements = [];
+
+        console.log('Inicializace proměnných dokončena');
+
+        // Inicializace audio elementů
+        const volumeControl = document.getElementById('volume-control');
+        const playButton = document.getElementById('play-button');
+        const stopButton = document.getElementById('stop-button');
+        const audioElement = new Audio("https://www.dropbox.com/scl/fi/xthbu4a9jvli6wkfavpen/Jirk-v-Futuristick-Kv-z-top-1.mp3?rlkey=rpg404uzibp95vgr9pq3segqo&st=briqeqs0&dl=1");
+
+        // Nastavení výchozí hlasitosti
+        audioElement.volume = 0.01;
+        volumeControl.value = audioElement.volume;
+
+        console.log('Inicializace audio elementů dokončena');
+
+        // Event listener pro změnu hlasitosti
+        volumeControl.addEventListener('input', (e) => {
+            audioElement.volume = e.target.value;
+            console.log(`Hlasitost nastavena na: ${e.target.value}`);
+        });
+
+        // Event listener pro přehrávání hudby
+        playButton.addEventListener('click', () => {
+            if (!isPlaying) {
+                audioElement.play();
+                isPlaying = true;
+                playButton.classList.add('active');
+                stopButton.classList.remove('active');
+                console.log('Hudba spuštěna');
+            } else {
+                console.log('Hudba už hraje');
+            }
+        });
+
+        // Event listener pro zastavení hudby
+        stopButton.addEventListener('click', () => {
+            audioElement.pause();
+            audioElement.currentTime = 0;
+            isPlaying = false;
+            stopButton.classList.add('active');
+            playButton.classList.remove('active');
+            console.log('Hudba zastavena');
+        });
+
+        // Event listener pro konec skladby
+        audioElement.addEventListener('ended', () => {
+            isPlaying = false;
+            playButton.classList.remove('active');
+            stopButton.classList.remove('active');
+            console.log('Hudba dohrála');
+        });
+
+        // Funkce pro aktualizaci počítadla správných a špatných odpovědí
+        function updateScore(correct) {
+            if (correct) {
+                correctAnswers++;
+                document.getElementById('correct-answers-display').innerText = `Správné: ${correctAnswers}`;
+                console.log(`Počet správných odpovědí zvýšen na: ${correctAnswers}`);
+            } else {
+                incorrectAnswers++;
+                document.getElementById('incorrect-answers-display').innerText = `Špatné: ${incorrectAnswers}`;
+                console.log(`Počet špatných odpovědí zvýšen na: ${incorrectAnswers}`);
+            }
+        }
+
+        // Funkce pro načtení otázky
+        function loadQuestion() {
+            console.log(`Načítám otázku č. ${currentQuestion + 1}`);
+            const questionData = quizData[currentQuestion];
+            const questionContainer = document.getElementById('question-container');
+            questionContainer.innerHTML = `
+                <div class="question-text">${questionData.question}</div>
+                <img src="${questionData.image}" alt="Otázka ${currentQuestion + 1}" class="question-image">
+                <div class="answers-container">
+                    ${questionData.answers.map((answer, index) => `
+                        <button class="answer-button" onclick="selectAnswer(${index})">${answer}</button>
+                    `).join('')}
+                </div>
+            `;
+            updateProgress();
+            updateScorePercentage();
+            startTimer();
+
+            // Inicializace tlačítek pauzy a startu (Pause/Resume Countdown)
+            pauseButton = document.getElementById('pause-button');
+            pauseButton.textContent = 'Pozastavit Odpočet'; // Ensure correct text on load
+            isPaused = false;
+
+            console.log('Tlačítka pro pozastavení a start inicializována');
+            console.log(`Otázka č. ${currentQuestion + 1} načtena a zobrazena`);
+        }
+
+        // Funkce pro výběr odpovědi
+        function selectAnswer(answerIndex) {
+            stopTimer();
+            console.log(`Uživatel vybral odpověď č. ${answerIndex + 1}`);
+            userAnswers[currentQuestion] = answerIndex;
+            const buttons = document.querySelectorAll('.answer-button');
+            buttons.forEach((button, index) => {
+                if (index === answerIndex) {
+                    button.classList.add(quizData[currentQuestion].correctAnswer === index ? 'correct' : 'incorrect');
+                    // Add feedback animation
+                    button.classList.add(quizData[currentQuestion].correctAnswer === index ? 'correct-feedback' : 'incorrect-feedback');
+                } else if (index === quizData[currentQuestion].correctAnswer) {
+                    button.classList.add('correct');
+                }
+                button.disabled = true;
+            });
+
+            if (quizData[currentQuestion].correctAnswer === answerIndex) {
+                console.log('Správná odpověď!');
+                score++;
+                updateScore(true);
+            } else {
+                console.log('Špatná odpověď.');
+                updateScore(false);
+            }
+
+            console.log(`Aktuální skóre: ${score}`);
+            updateScorePercentage();
+            console.log('Čekám 2.2 sekundy před zobrazením další otázky');
+            setTimeout(showNextQuestion, 2200);
+        }
+
+        // Funkce pro zobrazení další otázky
+        function showNextQuestion() {
+            console.log('Připravuji zobrazení další otázky.');
+            if (currentQuestion < quizData.length - 1) {
+                currentQuestion++;
+                console.log(`Přecházím na otázku č. ${currentQuestion + 1}`);
+                loadQuestion();
+            } else {
+                console.log('Konec kvízu, zobrazuji výsledky');
+                showResults();
+            }
+        }
+
+        // Funkce pro zobrazení výsledků
+        function showResults() {
+            console.log('Začínám zobrazovat výsledky.');
+            document.getElementById('question-container').classList.add('hidden');
+            document.getElementById('controls-row').classList.add('hidden'); // Skryjeme ovládací prvky
+            document.getElementById('stats-display-container').classList.add('hidden'); // Skryjeme statistiky
+            document.getElementById('progress-container').classList.add('hidden'); // Skryjeme progress bar
+            document.getElementById('results-container').classList.remove('hidden');
+            const resultsBody = document.querySelector('#results-table tbody');
+            resultsBody.innerHTML = '';
+            for (let i = 0; i < userAnswers.length; i++) {
+                const row = document.createElement('tr');
+
+                const questionCell = document.createElement('td');
+                questionCell.textContent = quizData[i].question;
+                row.appendChild(questionCell);
+
+                const userAnswerCell = document.createElement('td');
+                // Handle case where user didn't answer (timeLeft <= 0)
+                userAnswerCell.textContent = userAnswers[i] !== -1 ? quizData[i].answers[userAnswers[i]] : 'Čas vypršel';
+                userAnswerCell.classList.add(userAnswers[i] === quizData[i].correctAnswer ? 'correct-answer' : 'incorrect-answer');
+                row.appendChild(userAnswerCell);
+
+                const correctAnswerCell = document.createElement('td');
+                correctAnswerCell.textContent = quizData[i].answers[quizData[i].correctAnswer];
+                correctAnswerCell.classList.add('correct-answer');
+                row.appendChild(correctAnswerCell);
+
+                resultsBody.appendChild(row);
+            }
+
+            // Funkce pro výpočet procent a známky
+            function calculateGrade(score, totalQuestions) {
+                if (score < 0 || score > totalQuestions) {
+                    throw new Error("Neplatný počet bodů");
+                }
+
+                const percentage = (score / totalQuestions) * 100;
+                let grade;
+
+                // Určení známky pomocí pole
+                const gradeBoundaries = [
+                    { min: 90, grade: '1' },
+                    { min: 85, grade: '1-' },
+                    { min: 80, grade: '2' },
+                    { min: 75, grade: '2-' },
+                    { min: 60, grade: '3' },
+                    { min: 50, grade: '3-' },
+                    { min: 40, grade: '4' },
+                    { min: 30, grade: '4-' },
+                    { min: 0, grade: '5' }
+                ];
+
+                // Najde známku podle procenta
+                grade = gradeBoundaries.find(boundary => percentage >= boundary.min)?.grade || '5';
+
+                console.log(`Konečné skóre: ${score}/${totalQuestions} (${percentage.toFixed(2)}%)`);
+                console.log(`Konečná známka: ${grade}`);
+
+                return { percentage, grade };
+            }
+
+            // Funkce pro zobrazení výsledků
+            function displayResults(score, totalQuestions) {
+                const { percentage, grade } = calculateGrade(score, totalQuestions);
+
+                document.getElementById('final-score').textContent = `Vaše skóre: ${score}/${totalQuestions} (${percentage.toFixed(2)}%)`;
+                document.getElementById('final-grade').textContent = `Konečná známka: ${grade}`;
+
+                adjustTableHeight(); // Přizpůsobení výšky tabulky
+
+                // Kontrola achievementů a aktualizace statistik
+                checkAchievements();
+            }
+
+            // Příklad použití
+            function getCorrectAnswers() {
+                return quizData.filter(question => question.answeredCorrectly === true).length;
+            }
+            displayResults(score, totalQuestions); // Use the global totalQuestions
+        }
+
+        // Funkce pro úpravu výšky tabulky výsledků
+        function adjustTableHeight() {
+            const resultsTable = document.getElementById('results-table');
+            resultsTable.style.maxHeight = `${resultsTable.scrollHeight}px`;
+            console.log('Výška tabulky výsledků upravena');
+        }
+
+        // Funkce pro restart hry
+        function restartGame() {
+            console.log('Restartuji hru.');
+            currentQuestion = 0;
+            score = 0;
+            correctAnswers = 0;
+            incorrectAnswers = 0;
+            userAnswers = [];
+            document.getElementById('results-container').classList.add('hidden');
+            // Znovu zobrazíme startovací obrazovku pro nový start
+            document.getElementById('start-screen').classList.remove('hidden');
+            document.getElementById('quiz-container').style.display = 'none'; // Skryjeme kvíz
+            document.getElementById('controls-row').classList.remove('hidden'); // Znovu zobrazíme ovládací prvky
+            document.getElementById('stats-display-container').classList.remove('hidden'); // Znovu zobrazíme statistiky
+            document.getElementById('progress-container').classList.remove('hidden'); // Znovu zobrazíme progress bar
+
+            document.getElementById('correct-answers-display').innerText = 'Správné: 0';
+            document.getElementById('incorrect-answers-display').innerText = 'Špatné: 0';
+            document.getElementById('score-percentage-display').innerText = 'Skóre: 0.00%';
+            document.getElementById('timer-display').innerText = 'Čas: 20 s';
+
+
+            console.log('Všechny proměnné resetovány, čekám na nový start hry');
+            
+            // Resetuj stav audio tlačítek
+            stopButton.classList.remove('active');
+            playButton.classList.remove('active');
+            audioElement.pause();
+            audioElement.currentTime = 0;
+            isPlaying = false;
+        }
+
+        // Funkce pro spuštění časovače
+        function startTimer() {
+            timeLeft = timeLimit;
+            updateTimerDisplay();
+            console.log(`Časovač spuštěn, čas: ${timeLeft} s`);
+            timer = setInterval(() => {
+                if (!isPaused) {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        console.log('Čas vypršel, automaticky vybírám odpověď');
+                        selectAnswer(-1); // -1 znamená, že čas vypršel
+                    }
+                }
+            }, 1000);
+        }
+
+        // Funkce pro aktualizaci zobrazení časovače
+        function updateTimerDisplay() {
+            const timerElement = document.getElementById('timer-display'); // Změna ID
+            timerElement.textContent = `Čas: ${timeLeft} s`;
+            if (timeLeft <= 5) {
+                console.log(`Pozor, zbývá jen ${timeLeft} sekund!`);
+            }
+        }
+
+        // Funkce pro zastavení časovače
+        function stopTimer() {
+            clearInterval(timer);
+            console.log('Časovač zastaven');
+        }
+
+        // Funkce pro aktualizaci procentuálního skóre
+        function updateScorePercentage() {
+            const scorePercentage = (score / totalQuestions) * 100; // Use global totalQuestions
+            const scoreElement = document.getElementById('score-percentage-display'); // Změna ID
+            if (scoreElement) {
+                scoreElement.textContent = `Skóre: ${scorePercentage.toFixed(2)}%`;
+                console.log(`Aktualizováno procentuální skóre: ${scorePercentage.toFixed(2)}%`);
+            }
+        }
+
+        // Funkce pro pozastavení/obnovení časovače
+        function togglePause() {
+            isPaused = !isPaused;
+            if (isPaused) {
+                pauseButton.textContent = 'Pokračovat';
+                console.log('Kvíz pozastaven');
+            } else {
+                pauseButton.textContent = 'Pozastavit Odpočet';
+                console.log('Kvíz pokračuje');
+            }
+        }
+
+        // Funkce pro start odpočtu (už se v kódu nepoužívá přímo přes tlačítko)
+        function startCountdown() {
+            if (isPaused) {
+                isPaused = false;
+                pauseButton.textContent = 'Pozastavit Odpočet';
+                console.log('Odpočet znovu spuštěn');
+            }
+        }
+
+        // Nové funkce pro rozšířené prvky
+
+        // Funkce pro kontrolu a zobrazení achievementů
+        function checkAchievements() {
+            // Příklady achievementů
+            if (score >= 10 && !achievements.includes('tenCorrect')) { // Changed to 10 for easier testing
+                achievements.push('tenCorrect');
+                showAchievement('Dosaženo 10 bodů!');
+            }
+            // Add more achievements here based on score, correct answers in a row, time, etc.
+            console.log('Kontrola achievementů dokončena');
+        }
+
+        // Funkce pro zobrazení achievementu
+        function showAchievement(achievement) {
+            const achievementElement = document.createElement('div');
+            achievementElement.className = 'achievement';
+            achievementElement.textContent = achievement;
+            document.getElementById('achievements-container').appendChild(achievementElement);
+            console.log(`Achievement zobrazen: ${achievement}`);
+        }
+
+        // Funkce pro konec hry
+        function endGame() {
+            console.log('Hra ukončena, výsledky zobrazeny');
+            checkAchievements();
+            // updateStatistics(); // This function is not defined in the provided code, so commenting out
+            showResults();
+        }
+
+        // Event listener pro DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM načten, inicializuji komponenty');
+            const fullscreenButton = document.getElementById('fullscreen-button');
+            const quizContainer = document.getElementById('quiz-container');
+            const startScreen = document.getElementById('start-screen');
+            const startGameButton = document.getElementById('start-game-button');
+
+            // Set total questions display
+            document.getElementById('total-questions-display').textContent = totalQuestions;
+
+            // Logika spuštění hry přes startovací obrazovku
+            startGameButton.addEventListener('click', () => {
+                startScreen.classList.add('hidden'); // Skryje startovací obrazovku
+                quizContainer.style.display = 'block'; // Zobrazí kvízový kontejner
+                console.log('Hra spuštěna ze startovací obrazovky.');
+                loadQuestion(); // Načte první otázku a spustí hru
+            });
+
+            fullscreenButton.addEventListener('click', toggleFullscreen);
+
+            function toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    console.log('Přepínám do fullscreen režimu');
+                    if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen();
+                    } else if (document.documentElement.mozRequestFullScreen) {
+                        document.documentElement.mozRequestFullScreen();
+                    } else if (document.documentElement.webkitRequestFullscreen) {
+                        document.documentElement.webkitRequestFullscreen();
+                    } else if (document.documentElement.msRequestFullscreen) {
+                        document.documentElement.msRequestFullscreen();
+                    }
+                } else {
+                    console.log('Opouštím fullscreen režim');
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.documentElement.msExitFullscreen) {
+                        document.documentElement.msExitFullscreen();
+                    }
+                }
+            }
+
+            document.addEventListener('fullscreenchange', updateFullscreenButtonIcon);
+            document.addEventListener('webkitfullscreenchange', updateFullscreenButtonIcon);
+            document.addEventListener('mozfullscreenchange', updateFullscreenButtonIcon);
+            document.addEventListener('MSFullscreenChange', updateFullscreenButtonIcon);
+
+            function updateFullscreenButtonIcon() {
+                const fullscreenIcon = fullscreenButton.querySelector('.fullscreen-icon');
+                if (document.fullscreenElement) {
+                    fullscreenIcon.innerHTML = '✖'; // Use cross icon for exit
+                    console.log('Ikona fullscreen změněna na opuštění');
+                } else {
+                    fullscreenIcon.innerHTML = '↔'; // Use left-right arrow icon for entry
+                    console.log('Ikona fullscreen změněna na vstup');
+                }
+            }
+
+            // Inicializace tlačítek pro pauzu a start
+            pauseButton = document.getElementById('pause-button');
+            // startButton je v HTML, ale nyní slouží jen jako reference pro logiku restartu
+            // Pokud startButton už není potřeba, může být z HTML odstraněn
+            // let startButton = document.getElementById('start-button'); // Pokud ho budeme potřebovat v JS, ale v HTML je display: none
+
+            pauseButton.addEventListener('click', togglePause);
+
+            console.log('Event listenery pro tlačítka pause a start přidány');
+        });
+
+        // Skryje progress bar na začátku
+        const progressContainer = document.getElementById('progress-container');
+        const progress = document.getElementById('progress');
+        progressContainer.style.display = "none"; // Initially hidden
+
+        // Funkce pro aktualizaci ukazatele postupu
+        function updateProgress() {
+            // Aktualizace počítadla otázek
+            const currentQuestionElement = document.getElementById('current-question');
+            if (currentQuestionElement) {
+                currentQuestionElement.textContent = currentQuestion + 1; // +1 protože indexujeme od 0
+                console.log(`Aktualizuji počítadlo otázek na ${currentQuestion + 1}`);
+            }
+
+            // Zobrazí progress bar, pokud ještě není viditelný
+            if (progressContainer.style.display === "none") {
+                progressContainer.style.display = "block";
+            }
+
+            // Vypočítáme procenta na otázku
+            const percentagePerQuestion = 100 / totalQuestions; // Používáme skutečný počet otázek
+            const progressPercentage = (currentQuestion + 1) * percentagePerQuestion;
+
+            // Ujistíme se, že ne přesáhneme 100%
+            if (progressPercentage > 100) {
+                return;
+            }
+
+            // Spustí animaci progress baru
+            animateProgress(progress, progressPercentage);
+
+            console.log(`Aktualizuji ukazatel postupu na ${progressPercentage.toFixed(2)}%`);
+        }
+
+        // Funkce pro animaci progress baru
+        function animateProgress(progressElement, targetPercentage) {
+            let currentWidth = parseFloat(progressElement.style.width) || 0; // Načte aktuální šířku
+            const duration = 300; // ms, duration of animation
+            const frames = duration / 10; // Number of frames for 10ms interval
+            const step = (targetPercentage - currentWidth) / frames;
+
+            let frameCount = 0;
+            const interval = setInterval(() => {
+                if (frameCount >= frames) {
+                    clearInterval(interval); // Zastaví animaci
+                    progressElement.style.width = targetPercentage + '%'; // Ensure it ends exactly at target
+                    progressElement.textContent = targetPercentage.toFixed(0) + '%';
+                } else {
+                    currentWidth += step;
+                    progressElement.style.width = currentWidth + '%';
+                    progressElement.textContent = currentWidth.toFixed(0) + '%';
+                    frameCount++;
+                }
+            }, 10); // Rychlost animace
+        }
+    </script>
+</body>
+</html>
